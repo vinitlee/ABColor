@@ -1,285 +1,110 @@
+import scipy.optimize as optimize
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.axes3d import Axes3D
+from pylab import *
+import numpy as np
+from matplotlib import cm
+from refcolors import *
+from color import *
 
-baseColors = ["e51c23",
-              "e91e63",
-              "9c27b0",
-              "673ab7",
-              "3f51b5",
-              "5677fc",
-              "03a9f4",
-              "00bcd4",
-              "009688",
-              "259b24",
-              "8bc34a",
-              "cddc39",
-              "ffeb3b",
-              "ffc107",
-              "ff9800",
-              "ff5722"]
+fig = plt.figure()
+ax = fig.gca(projection='3d')
 
-colorSets = [["fde0dc",
-              "f9bdbb",
-              "f69988",
-              "f36c60",
-              "e84e40",
-              "e51c23",
-              "dd191d",
-              "d01716",
-              "c41411",
-              "b0120a",
-              "ff7997",
-              "ff5177",
-              "ff2d6f",
-              "e00032"],
-             ["fce4ec",
-              "f8bbd0",
-              "f48fb1",
-              "f06292",
-              "ec407a",
-              "e91e63",
-              "d81b60",
-              "c2185b",
-              "ad1457",
-              "880e4f",
-              "ff80ab",
-              "ff4081",
-              "f50057",
-              "c51162"],
-             ["f3e5f5",
-              "e1bee7",
-              "ce93d8",
-              "ba68c8",
-              "ab47bc",
-              "9c27b0",
-              "8e24aa",
-              "7b1fa2",
-              "6a1b9a",
-              "4a148c",
-              "ea80fc",
-              "e040fb",
-              "d500f9",
-              "aa00ff"],
-             ["ede7f6",
-              "d1c4e9",
-              "b39ddb",
-              "9575cd",
-              "7e57c2",
-              "673ab7",
-              "5e35b1",
-              "512da8",
-              "4527a0",
-              "311b92",
-              "b388ff",
-              "7c4dff",
-              "651fff",
-              "6200ea"],
-             ["e8eaf6",
-              "c5cae9",
-              "9fa8da",
-              "7986cb",
-              "5c6bc0",
-              "3f51b5",
-              "3949ab",
-              "303f9f",
-              "283593",
-              "1a237e",
-              "8c9eff",
-              "536dfe",
-              "3d5afe",
-              "304ffe"],
-             ["e7e9fd",
-              "d0d9ff",
-              "afbfff",
-              "91a7ff",
-              "738ffe",
-              "5677fc",
-              "4e6cef",
-              "455ede",
-              "3b50ce",
-              "2a36b1",
-              "a6baff",
-              "6889ff",
-              "4d73ff",
-              "4d69ff"],
-             ["e1f5fe",
-              "b3e5fc",
-              "81d4fa",
-              "4fc3f7",
-              "29b6f6",
-              "03a9f4",
-              "039be5",
-              "0288d1",
-              "0277bd",
-              "01579b",
-              "80d8ff",
-              "40c4ff",
-              "00b0ff",
-              "0091ea"],
-             ["e0f7fa",
-              "b2ebf2",
-              "80deea",
-              "4dd0e1",
-              "26c6da",
-              "00bcd4",
-              "00acc1",
-              "0097a7",
-              "00838f",
-              "006064",
-              "84ffff",
-              "18ffff",
-              "00e5ff",
-              "00b8d4"],
-             ["e0f2f1",
-              "b2dfdb",
-              "80cbc4",
-              "4db6ac",
-              "26a69a",
-              "009688",
-              "00897b",
-              "00796b",
-              "00695c",
-              "004d40",
-              "a7ffeb",
-              "64ffda",
-              "1de9b6",
-              "00bfa5"],
-             ["d0f8ce",
-              "a3e9a4",
-              "72d572",
-              "42bd41",
-              "2baf2b",
-              "259b24",
-              "0a8f08",
-              "0a7e07",
-              "056f00",
-              "0d5302",
-              "a2f78d",
-              "5af158",
-              "14e715",
-              "12c700"],
-             ["f1f8e9",
-              "dcedc8",
-              "c5e1a5",
-              "aed581",
-              "9ccc65",
-              "8bc34a",
-              "7cb342",
-              "689f38",
-              "558b2f",
-              "33691e",
-              "ccff90",
-              "b2ff59",
-              "76ff03",
-              "64dd17"],
-             ["f9fbe7",
-              "f0f4c3",
-              "e6ee9c",
-              "dce775",
-              "d4e157",
-              "cddc39",
-              "c0ca33",
-              "afb42b",
-              "9e9d24",
-              "827717",
-              "f4ff81",
-              "eeff41",
-              "c6ff00",
-              "aeea00"],
-             ["fffde7",
-              "fff9c4",
-              "fff59d",
-              "fff176",
-              "ffee58",
-              "ffeb3b",
-              "fdd835",
-              "fbc02d",
-              "f9a825",
-              "f57f17",
-              "ffff8d",
-              "ffff00",
-              "ffea00",
-              "ffd600"],
-             ["fff8e1",
-              "ffecb3",
-              "ffe082",
-              "ffd54f",
-              "ffca28",
-              "ffc107",
-              "ffb300",
-              "ffa000",
-              "ff8f00",
-              "ff6f00",
-              "ffe57f",
-              "ffd740",
-              "ffc400",
-              "ffab00"],
-             ["fff3e0",
-              "ffe0b2",
-              "ffcc80",
-              "ffb74d",
-              "ffa726",
-              "ff9800",
-              "fb8c00",
-              "f57c00",
-              "ef6c00",
-              "e65100",
-              "ffd180",
-              "ffab40",
-              "ff9100",
-              "ff6d00"],
-             ["fbe9e7",
-              "ffccbc",
-              "ffab91",
-              "ff8a65",
-              "ff7043",
-              "ff5722",
-              "f4511e",
-              "e64a19",
-              "d84315",
-              "bf360c",
-              "ff9e80",
-              "ff6e40",
-              "ff3d00",
-              "dd2c00"]]
+X,Y,Z = [],[],[]
 
-class color(object):
-  """Describes a color"""
-  def __init__(self, rgb):
-    self.r = rgb[0]
-    self.g = rgb[1]
-    self.b = rgb[2]
-  def hsv(self):
-    rP = self.r/255.0
-    gP = self.g/255.0
-    bP = self.b/255.0
+for x in range(len(baseColors)):
+  for y in range(len(colorSets[x])):
+    setC = color(colorSets[x][y]).hsv("h")
+    if setC > 180:
+      setC -= 360
+    X += [ color(colorSets[x][y]).hsv("h") ]
 
-    cMax = max(rP,gP,bP)
-    cMin = min(rP,gP,bP)
-
-    delta = float(cMax - cMin)
-
-    h = 0
-    if delta == 0:
-      h = 0
-    elif   cMax == rP:
-      h = 60 * (((gP - bP) / delta) % 6)
-    elif cMax == gP:
-      h = 60 * (((bP - rP) / delta) + 2)
-    elif cMax == bP:
-      h = 60 * (((rP - gP) / delta) + 4)
-
-    s = 0
-    if (delta != 0):
-      s = delta / cMax
-
-    v = cMax
-
-    return (h,s,v)
-  def __str__(self):
-    return "Color defined by R"+str(self.r)+" G"+str(self.g)+" B"+str(self.b)
-
-for i in baseColors:
-  print color((int(i[0:2],16),int(i[2:4],16),int(i[4:6],16))).hsv()
-
-plt.plot(range(len(baseColors)), [color((int(i[0:2],16),int(i[2:4],16),int(i[4:6],16))).hsv() for i in baseColors])
+    Y += [ enumeration[y]  ]
+    
+    specC = color(baseColors[x]).hsv("h")
+    if specC > 180:
+      specC -= 360
+    Z += [ specC - setC ]
+p = ax.scatter(X,Y,Z,c="r")
 plt.show()
+
+A = np.array(zip(X, Y, Z))
+
+def func(data, a, b, c, d, e, f, g, h):
+    return  a*data[:,0]**3 +\
+            b*data[:,1]**3 +\
+            c*data[:,0]**2 +\
+            d*data[:,1]**2 +\
+            e*data[:,0]*data[:,1] +\
+            f*data[:,0] +\
+            g*data[:,1] +\
+            h
+
+guess = (1,1,1,1,1,1,1,1)
+params, pcov = optimize.curve_fit(func, A[:,:2], A[:,2], guess)
+print "Hue"
+print(params)
+
+# # -------------------------------------
+
+# fig = plt.figure()
+# ax = fig.gca(projection='3d')
+
+# X,Y,Z = [],[],[]
+# for x in range(len(baseColors)):
+#   for y in range(len(colorSets[x])):
+#     X += [ color(colorSets[x][y]).hsv("h") ]
+#     Y += [ enumeration[y]  ]
+#     Z += [ color(baseColors[x]).hsv("s") ]
+# p = ax.scatter(X,Y,Z,c="g")
+# plt.show()
+
+# A = np.array(zip(X, Y, Z))
+
+# def func(data, a, b, c, d, e, f, g, h):
+#     return  a*data[:,0]**3 +\
+#             b*data[:,1]**3 +\
+#             c*data[:,0]**2 +\
+#             d*data[:,1]**2 +\
+#             e*data[:,0]*data[:,1] +\
+#             f*data[:,0] +\
+#             g*data[:,1] +\
+#             h
+
+# guess = (1,1,1,1,1,1,1,1)
+# params, pcov = optimize.curve_fit(func, A[:,:2], A[:,2], guess)
+# print "Sat"
+# print(params)
+
+# fig = plt.figure()
+# ax = fig.gca(projection='3d')
+
+# X,Y,Z = [],[],[]
+# for x in range(len(baseColors)):
+#   # print colorSets[x]
+#   for y in range(len(colorSets[x])):
+#     X += [ color(colorSets[x][y]).hsv("h") ]
+#     Y += [ enumeration[y]  ]
+#     Z += [ color(baseColors[x]).hsv("v") ]
+# p = ax.scatter(X,Y,Z,c="b")
+# plt.show()
+
+# A = np.array(zip(X, Y, Z))
+
+# def func(data, a, b, c, d, e, f, g, h):
+#     return  a*data[:,0]**3 +\
+#             b*data[:,1]**3 +\
+#             c*data[:,0]**2 +\
+#             d*data[:,1]**2 +\
+#             e*data[:,0]*data[:,1] +\
+#             f*data[:,0] +\
+#             g*data[:,1] +\
+#             h
+
+# guess = (1,1,1,1,1,1,1,1)
+# params, pcov = optimize.curve_fit(func, A[:,:2], A[:,2], guess)
+# print "Val"
+# print(params)
+
+hue = linspace(0,360)
+grd = linspace(50,900)
